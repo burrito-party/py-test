@@ -11,14 +11,14 @@
 #
 name: "CodeQL2"
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ "main" ]
-  schedule:
-    - cron: '42 11 * * 2'
+# on:
+#  push:
+#    branches: [ "main" ]
+#  pull_request:
+#    # The branches below must be a subset of the branches above
+#    branches: [ "main" ]
+#  schedule:
+#    - cron: '42 11 * * 2'
 
 jobs:
   smart_scan:
