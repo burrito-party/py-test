@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_py_test_1726626236585-push-trigger-input-set
+  identifier: Build_py_test_1726626236585pushtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: Build_py_test_1726626236585
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: <+trigger.branch>
