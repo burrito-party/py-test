@@ -12,22 +12,14 @@ pipeline:
   stages:
     - stage:
         identifier: build
-        name: build
+        name: CodeQL
         spec:
           caching:
             enabled: true
+            paths: []
           cloneCodebase: true
           execution:
             steps:
-              - step:
-                  identifier: runlinter
-                  name: run linter
-                  spec:
-                    command: |-
-                      pip install flake8
-                      flake8 .
-                  timeout: ""
-                  type: Run
               - step:
                   identifier: setupvirtualenvironment
                   name: setup virtual environment
@@ -39,10 +31,43 @@ pipeline:
                       python3 -m pip install -e .
                   timeout: ""
                   type: Run
+              - step:
+                  type: Run
+                  name: Download CodeQL Bundle
+                  identifier: Download_CodeQL_Bundle
+                  spec:
+                    shell: Sh
+                    command: |-
+                      sh "wget https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz -O ../codeql-bundle-linux64.tar.gz"
+                      sh "tar xzvf ../codeql-bundle-linux64.tar.gz -C ../"
+                      sh "rm ../codeql-bundle-linux64.tar.gz"
+                      sh "export PATH=$(cd ..; pwd)/codeql:$PATH"
+              - step:
+                  type: Run
+                  name: Create Database
+                  identifier: Create_Database
+                  spec:
+                    shell: Sh
+                    command: sh "codeql database create --language=python db"
+              - step:
+                  type: Run
+                  name: Analyze Database
+                  identifier: Analyze_Database
+                  spec:
+                    shell: Sh
+                    command: sh "codeql database analyze /codeql-dbs/repo-db javascript-security-and-quality.qls --format=sarif-latest --output=./temp/results-js.sarif"
+              - step:
+                  type: Run
+                  name: Upload CodeQL Results
+                  identifier: Upload_CodeQL_Results
+                  spec:
+                    shell: Sh
+                    command: sh "codeql github upload-results --sarif=./temp/results-js.sarif --github-auth-stdin --github-url=https://github.com/ --repository=octo-org/example-repo-2 --ref=refs/heads/main --commit=deb275d2d5fe9a522a0b7bd8b6b6a1c939552718
           platform:
-            arch: Amd64
             os: Linux
+            arch: Amd64
           runtime:
-            spec: {}
             type: Cloud
+            spec: {}
         type: CI
+        description: ""
